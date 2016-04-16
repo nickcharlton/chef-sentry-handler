@@ -1,12 +1,12 @@
-require 'raven'
+require "raven"
 
 module Raven
   module Chef
     class SentryHandler < ::Chef::Handler
       def initialize(node)
         Raven.configure do |config|
-          config.ssl_verification = node['sentry']['verify_ssl']
-          config.dsn = node['sentry']['dsn']
+          config.ssl_verification = node["sentry"]["verify_ssl"]
+          config.dsn = node["sentry"]["dsn"]
           config.logger = ::Chef::Log
           config.current_environment = node.chef_environment
           config.environments = [node.chef_environment]
@@ -19,16 +19,16 @@ module Raven
         return if success?
         Raven.logger.info "Logging run failure to Sentry server"
         if exception
-          evt = Raven::Event.capture_exception(exception)
+          event = Raven::Event.capture_exception(exception)
         else
-          evt = Raven::Event.new do |evt|
+          event = Raven::Event.new do |evt|
             evt.message = "Unknown error during Chef run"
             evt.level = :error
           end
         end
         # Use the node name, not the FQDN
-        evt.server_name = node.name
-        Raven.send_event(evt)
+        event.server_name = node.name
+        Raven.send_event(event)
       end
     end
   end

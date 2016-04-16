@@ -4,7 +4,7 @@ module Raven
   module Chef
     class SentryHandler < ::Chef::Handler
       def initialize(node)
-        Raven.configure(true) do |config|
+        Raven.configure do |config|
           config.ssl_verification = node['sentry']['verify_ssl']
           config.dsn = node['sentry']['dsn']
           config.logger = ::Chef::Log
@@ -28,7 +28,7 @@ module Raven
         end
         # Use the node name, not the FQDN
         evt.server_name = node.name
-        Raven.send(evt)
+        Raven.send_event(evt)
       end
     end
   end
